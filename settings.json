@@ -1,7 +1,3 @@
 {
-  "displayName": "Example App",
-  "main": "hello.tsx",
-  "settings": [
-    
-  ]
+  "nameId": "hello"
 }

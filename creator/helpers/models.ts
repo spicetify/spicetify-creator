@@ -1,20 +1,13 @@
 export interface ICustomAppSettings {
-  "displayName": string,
-  "name": string,
-  "icon": string,
-  "activeIcon": string,
-  "settings": [],
-}
+  displayName: string,
+  nameId: string,
+  icon: string,
+  activeIcon: string,
+};
 
 export interface IExtensionSettings {
-  "displayName": string,
-  "main": string,
-  "settings": [],
-}
-
-export interface IExtensionMarketplaceManifest {
-  
-}
+  nameId: string,
+};
 
 // The manifest every custom app should have
 export interface ICustomAppManifest {
@@ -23,4 +16,4 @@ export interface ICustomAppManifest {
   "active-icon": string,
   "subfiles": string[],
   "subfiles_extension": string[],
-}
+};

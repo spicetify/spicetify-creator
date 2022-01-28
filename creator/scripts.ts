@@ -14,7 +14,7 @@ const build = async (watch: boolean, outDirectory?: string) => {
   const id = generateId(12)
   const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync('./settings.json', 'utf-8'));
   const spicetifyDirectory = await exec("spicetify -c").then((o: any) => path.dirname(o.stdout.trim()));
-  const isExtension = Object.keys(settings).includes("main");
+  const isExtension = !Object.keys(settings).includes("icon");
   
   if (isExtension) {
     console.log("Extension detected");
@@ -26,7 +26,7 @@ const build = async (watch: boolean, outDirectory?: string) => {
     if (isExtension) {
       outDirectory = path.join(spicetifyDirectory, "Extensions"); // TODO test
     } else {
-      outDirectory = path.join(spicetifyDirectory, "CustomApps", settings.name);
+      outDirectory = path.join(spicetifyDirectory, "CustomApps", settings.nameId);
     }
   }
 
@@ -46,7 +46,6 @@ const build = async (watch: boolean, outDirectory?: string) => {
         modules: {
           generateScopedName: `[name]__[local]___[hash:base64:5]${id}`
         },
-        styleInject: true,
       }),
     ],
   }
