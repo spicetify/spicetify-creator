@@ -1,1 +1,5 @@
-import "../../src/app";
+import main from "../../src/app";
+
+(async () => {
+  await main()
+})()
