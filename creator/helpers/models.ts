@@ -1,8 +1,19 @@
-// The manifest for this project
-export interface INewManifest {
+export interface ICustomAppSettings {
+  "displayName": string,
   "name": string,
   "icon": string,
   "activeIcon": string,
+  "settings": [],
+}
+
+export interface IExtensionSettings {
+  "displayName": string,
+  "main": string,
+  "settings": [],
+}
+
+export interface IExtensionMarketplaceManifest {
+  
 }
 
 // The manifest every custom app should have

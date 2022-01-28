@@ -1,5 +1,5 @@
 {
-  "name": "spicetify-customapp",
+  "name": "spicetify-creator",
   "version": "1.0.0",
   "description": "",
   "devDependencies": {
@@ -16,8 +16,7 @@
     "typescript-plugin-css-modules": "^3.4.0"
   },
   "scripts": {
-    "build": "ts-node scripts/build.ts",
-    "addApp": "ts-node scripts/addApp.ts"
+    "build": "ts-node creator/build.ts"
   },
   "license": "MIT",
   "dependencies": {
