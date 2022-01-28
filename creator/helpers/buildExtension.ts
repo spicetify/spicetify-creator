@@ -42,22 +42,24 @@ export default async (settings: IExtensionSettings, outDirectory: string, watch:
     }
 
     console.log("Bundling css and js...");
-    const css = fs.readFileSync(compiledExtensionCSS, "utf-8");
-    fs.rmSync(compiledExtensionCSS);
-    fs.appendFileSync(compiledExtension, `
-
-(async () => {
-  if (!document.getElementById(\`${esbuildOptions.globalName}\`)) {
-    var el = document.createElement('style');
-    el.id = \`${esbuildOptions.globalName}\`;
-    el.textContent = (String.raw\`
-${css}
-    \`).trim();
-    document.head.appendChild(el);
-  }
-})()
-
-    `.trim());
+    if (fs.existsSync(compiledExtensionCSS)) {
+      const css = fs.readFileSync(compiledExtensionCSS, "utf-8");
+      fs.rmSync(compiledExtensionCSS);
+      fs.appendFileSync(compiledExtension, `
+  
+  (async () => {
+    if (!document.getElementById(\`${esbuildOptions.globalName}\`)) {
+      var el = document.createElement('style');
+      el.id = \`${esbuildOptions.globalName}\`;
+      el.textContent = (String.raw\`
+  ${css}
+      \`).trim();
+      document.head.appendChild(el);
+    }
+  })()
+  
+      `.trim());
+    }
 
     console.log(colors.green('Build succeeded.'));
   }
