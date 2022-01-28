@@ -5,7 +5,6 @@ import { ICustomAppSettings, IExtensionSettings } from './helpers/models'
 import generateId from './helpers/generateId'
 import buildCustomApp from './helpers/buildCustomApp'
 import buildExtension from './helpers/buildExtension'
-const esbuild = require("esbuild")
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
 
@@ -36,16 +35,6 @@ const build = async (watch: boolean, outDirectory?: string) => {
     fs.mkdirSync(outDirectory);
   }
 
-  // Clear outDirectory
-  fs.readdir(outDirectory, (err, files) => {
-    if (err) throw err;
-    for (const file of files) {
-      fs.unlink(path.join(outDirectory!, file), err => {
-        if (err) throw err;
-      });
-    }
-  });
-
   const esbuildOptions = {
     platform: 'browser',
     external: ['react', 'react-dom'],
@@ -56,7 +45,8 @@ const build = async (watch: boolean, outDirectory?: string) => {
         plugins: [autoprefixer],
         modules: {
           generateScopedName: `[name]__[local]___[hash:base64:5]${id}`
-        }
+        },
+        styleInject: true,
       }),
     ],
   }

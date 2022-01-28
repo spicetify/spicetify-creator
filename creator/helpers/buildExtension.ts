@@ -9,8 +9,9 @@ const autoprefixer = require("autoprefixer");
 
 export default async (settings: IExtensionSettings, outDirectory: string, watch: boolean, esbuildOptions: any) => {
   const extension = path.join("./src/", settings.main)
-  const extensionNewName = path.basename(extension.substring(0, extension.lastIndexOf(".")) + ".js");
-  const compiledExtension = path.join(outDirectory, extensionNewName);
+  const extensionName = path.basename(extension.substring(0, extension.lastIndexOf(".")));
+  const compiledExtension = path.join(outDirectory, `${extensionName}.js`);
+  const compiledExtensionCSS = path.join(outDirectory, `${extensionName}.css`);
 
   esbuild.build({
     entryPoints: [extension],
@@ -39,6 +40,24 @@ export default async (settings: IExtensionSettings, outDirectory: string, watch:
       data.splice(appendAbove + 1, 0,    `if (x === "react-dom") return Spicetify.ReactDOM;`);
       fs.writeFileSync(compiledExtension, data.join("\n")+"\n");
     }
+
+    console.log("Bundling css and js...");
+    const css = fs.readFileSync(compiledExtensionCSS, "utf-8");
+    fs.rmSync(compiledExtensionCSS);
+    fs.appendFileSync(compiledExtension, `
+
+(async () => {
+  if (!document.getElementById(\`${esbuildOptions.globalName}\`)) {
+    var el = document.createElement('style');
+    el.id = \`${esbuildOptions.globalName}\`;
+    el.textContent = (String.raw\`
+${css}
+    \`).trim();
+    document.head.appendChild(el);
+  }
+})()
+
+    `.trim());
 
     console.log(colors.green('Build succeeded.'));
   }
