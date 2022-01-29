@@ -55,5 +55,9 @@ yarn run build --watch
   "nameId": "my-app"
 }
 ```
+
+## TODO
+- Plugins
+
 ---
 An improved version of https://github.com/FlafyDev/spicetify-custom-app

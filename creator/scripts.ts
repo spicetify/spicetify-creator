@@ -24,7 +24,7 @@ const build = async (watch: boolean, outDirectory?: string) => {
 
   if (!outDirectory) {
     if (isExtension) {
-      outDirectory = path.join(spicetifyDirectory, "Extensions"); // TODO test
+      outDirectory = path.join(spicetifyDirectory, "Extensions");
     } else {
       outDirectory = path.join(spicetifyDirectory, "CustomApps", settings.nameId);
     }
