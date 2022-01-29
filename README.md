@@ -18,7 +18,7 @@ Easily make Spicetify extensions and custom apps.
 ```
 npx create-spicetify-app
 cd my-app
-spicetify config extensions my-app
+spicetify config extensions my-app OR spicetify config custom_apps my-app
 yarn
 ```
 ### Building
@@ -28,12 +28,7 @@ spicetify apply
 ```
 ### Watching
 ```
-spicetify watch -le
-yarn run build --watch
-```
-or
-```
-spicetify watch -la
+spicetify watch -le OR spicetify watch -la
 yarn run build --watch
 ```
 
