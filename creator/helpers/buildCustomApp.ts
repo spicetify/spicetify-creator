@@ -10,16 +10,6 @@ export default async (settings: ICustomAppSettings, outDirectory: string, watch:
   const extensions = await glob.sync("./src/extensions/*(*.ts|*.tsx|*.js|*.jsx)");
   const extensionsNewNames = extensions.map(e => e.substring(0, e.lastIndexOf(".")) + ".js");
 
-  // Clear outDirectory
-  fs.readdir(outDirectory, (err, files) => {
-    if (err) throw err;
-    for (const file of files) {
-      fs.unlink(path.join(outDirectory!, file), err => {
-        if (err) throw err;
-      });
-    }
-  });
-
   console.log("Generating manifest.json...")
   const customAppManifest = <ICustomAppManifest>{
     name: settings.displayName,
