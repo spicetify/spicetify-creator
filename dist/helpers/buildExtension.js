@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const glob_1 = __importDefault(require("glob"));
 const safe_1 = __importDefault(require("colors/safe"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -14,7 +15,19 @@ exports.default = async (settings, outDirectory, watch, esbuildOptions) => {
     // const extensionName = path.basename(extension.substring(0, extension.lastIndexOf(".")));
     const compiledExtension = path_1.default.join(outDirectory, `${settings.nameId}.js`);
     const compiledExtensionCSS = path_1.default.join(outDirectory, `${settings.nameId}.css`);
-    esbuild.build(Object.assign(Object.assign({ entryPoints: ['./src/app.tsx'], outfile: compiledExtension }, esbuildOptions), { watch: (watch ? {
+    const appPath = path_1.default.resolve(glob_1.default.sync('./src/*(app.ts|app.tsx|app.js|app.jsx)')[0]);
+    const tempFolder = path_1.default.join(__dirname, `../temp/`);
+    const indexPath = path_1.default.join(tempFolder, `index.jsx`);
+    if (!fs_1.default.existsSync(tempFolder))
+        fs_1.default.mkdirSync(tempFolder);
+    fs_1.default.writeFileSync(indexPath, `
+import main from \'${appPath.replace(/\\/g, "/")}\'
+
+(async () => {
+  await main()
+})();
+  `.trim());
+    esbuild.build(Object.assign(Object.assign({ entryPoints: [indexPath], outfile: compiledExtension }, esbuildOptions), { watch: (watch ? {
             async onRebuild(error, result) {
                 if (error)
                     console.error(error);

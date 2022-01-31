@@ -13,11 +13,9 @@ const buildExtension_1 = __importDefault(require("./helpers/buildExtension"));
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
 const exec = (0, util_1.promisify)(require('child_process').exec);
-// const appRoot = require('app-root-path').path;
-const appRoot = "D:\\SpotifyExtensions\\spicetify-creator-test\\";
-const build = async (watch, outDirectory) => {
+const build = async (watch, minify, outDirectory) => {
     const id = (0, generateId_1.default)(12);
-    const settings = JSON.parse(fs_1.default.readFileSync(path_1.default.join(appRoot, "src/settings.json"), 'utf-8'));
+    const settings = JSON.parse(fs_1.default.readFileSync("./src/settings.json", 'utf-8'));
     const spicetifyDirectory = await exec("spicetify -c").then((o) => path_1.default.dirname(o.stdout.trim()));
     const isExtension = !Object.keys(settings).includes("icon");
     if (isExtension) {
@@ -41,6 +39,7 @@ const build = async (watch, outDirectory) => {
     const esbuildOptions = {
         platform: 'browser',
         external: ['react', 'react-dom'],
+        minify: minify,
         bundle: true,
         globalName: id,
         plugins: [

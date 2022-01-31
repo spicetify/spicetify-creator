@@ -7,7 +7,7 @@ import extractFiles from './extractFiles'
 const esbuild = require("esbuild")
 
 export default async (settings: ICustomAppSettings, outDirectory: string, watch: boolean, esbuildOptions: any) => {
-  const extensions = await glob.sync("./src/extensions/*(*.ts|*.tsx|*.js|*.jsx)");
+  const extensions = glob.sync("./src/extensions/*(*.ts|*.tsx|*.js|*.jsx)");
   const extensionsNewNames = extensions.map(e => e.substring(0, e.lastIndexOf(".")) + ".js");
 
   console.log("Generating manifest.json...")
@@ -20,10 +20,23 @@ export default async (settings: ICustomAppSettings, outDirectory: string, watch:
   }
   fs.writeFileSync(path.join(outDirectory, "manifest.json"), JSON.stringify(customAppManifest, null, 2))
 
-  fs.writeFileSync("")
+  const appPath = path.resolve(glob.sync('./src/*(app.ts|app.tsx|app.js|app.jsx)')[0]);
+  const tempFolder = path.join(__dirname,`../temp/`);
+  const indexPath = path.join(tempFolder,`index.jsx`);
+
+  if (!fs.existsSync(tempFolder))
+    fs.mkdirSync(tempFolder)
+  fs.writeFileSync(indexPath, `
+import App from \'${appPath.replace(/\\/g, "/")}\'
+import React from 'react';
+
+export default function render() {
+  return <App />;
+}
+  `.trim())
 
   esbuild.build({
-    entryPoints: [path.join(__dirname,`../custom-app/index.js`)],
+    entryPoints: [indexPath, ...extensions],
     outdir: outDirectory,
     ...esbuildOptions,
     watch: (watch ? {

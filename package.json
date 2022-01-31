@@ -4,12 +4,13 @@
   "description": "",
   "bin": "./dist/index.js",
   "scripts": {
-    "build": "tsc --watch",
-    "build-dev": "tsc --watch"
+    "build": "tsc",
+    "build-dev": "tsc --watch",
+    "postinstall": "yarn run build"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11"
@@ -19,7 +20,6 @@
     "ts-node": "^10.4.0",
     "tsc": "^2.0.4",
     "typescript": "^4.5.5",
-    "app-root-path": "^3.0.0",
     "minimist": "^1.2.5",
     "@types/glob": "^7.2.0",
     "colors": "^1.4.0",

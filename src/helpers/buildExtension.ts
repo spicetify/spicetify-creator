@@ -13,8 +13,22 @@ export default async (settings: IExtensionSettings, outDirectory: string, watch:
   const compiledExtension = path.join(outDirectory, `${settings.nameId}.js`);
   const compiledExtensionCSS = path.join(outDirectory, `${settings.nameId}.css`);
 
+  const appPath = path.resolve(glob.sync('./src/*(app.ts|app.tsx|app.js|app.jsx)')[0]);
+  const tempFolder = path.join(__dirname,`../temp/`);
+  const indexPath = path.join(tempFolder,`index.jsx`);
+  
+  if (!fs.existsSync(tempFolder))
+    fs.mkdirSync(tempFolder)
+  fs.writeFileSync(indexPath, `
+import main from \'${appPath.replace(/\\/g, "/")}\'
+
+(async () => {
+  await main()
+})();
+  `.trim())
+
   esbuild.build({
-    entryPoints: ['./src/app.tsx'],
+    entryPoints: [indexPath],
     outfile: compiledExtension,
     ...esbuildOptions,
     watch: (watch ? {

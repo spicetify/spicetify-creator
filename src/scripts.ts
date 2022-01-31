@@ -10,12 +10,9 @@ const autoprefixer = require("autoprefixer");
 
 const exec = promisify(require('child_process').exec);
 
-// const appRoot = require('app-root-path').path;
-const appRoot = "D:\\SpotifyExtensions\\spicetify-creator-test\\"
-
-const build = async (watch: boolean, outDirectory?: string) => {
+const build = async (watch: boolean, minify: boolean, outDirectory?: string) => {
   const id = generateId(12)
-  const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync(path.join(appRoot,"src/settings.json"), 'utf-8'));
+  const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync("./src/settings.json", 'utf-8'));
   const spicetifyDirectory = await exec("spicetify -c").then((o: any) => path.dirname(o.stdout.trim()));
   const isExtension = !Object.keys(settings).includes("icon");
   
@@ -41,6 +38,7 @@ const build = async (watch: boolean, outDirectory?: string) => {
   const esbuildOptions = {
     platform: 'browser',
     external: ['react', 'react-dom'],
+    minify: minify,
     bundle: true,
     globalName: id,
     plugins: [

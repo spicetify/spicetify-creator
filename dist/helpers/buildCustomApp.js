@@ -10,7 +10,7 @@ const path_1 = __importDefault(require("path"));
 const extractFiles_1 = __importDefault(require("./extractFiles"));
 const esbuild = require("esbuild");
 exports.default = async (settings, outDirectory, watch, esbuildOptions) => {
-    const extensions = await glob_1.default.sync("./src/extensions/*(*.ts|*.tsx|*.js|*.jsx)");
+    const extensions = glob_1.default.sync("./src/extensions/*(*.ts|*.tsx|*.js|*.jsx)");
     const extensionsNewNames = extensions.map(e => e.substring(0, e.lastIndexOf(".")) + ".js");
     console.log("Generating manifest.json...");
     const customAppManifest = {
@@ -21,8 +21,20 @@ exports.default = async (settings, outDirectory, watch, esbuildOptions) => {
         subfiles_extension: extensionsNewNames.map(e => path_1.default.basename(e))
     };
     fs_1.default.writeFileSync(path_1.default.join(outDirectory, "manifest.json"), JSON.stringify(customAppManifest, null, 2));
-    console.log(__dirname);
-    esbuild.build(Object.assign(Object.assign({ entryPoints: [path_1.default.join(__dirname, `../custom-app/index.js`)], outdir: outDirectory }, esbuildOptions), { watch: (watch ? {
+    const appPath = path_1.default.resolve(glob_1.default.sync('./src/*(app.ts|app.tsx|app.js|app.jsx)')[0]);
+    const tempFolder = path_1.default.join(__dirname, `../temp/`);
+    const indexPath = path_1.default.join(tempFolder, `index.jsx`);
+    if (!fs_1.default.existsSync(tempFolder))
+        fs_1.default.mkdirSync(tempFolder);
+    fs_1.default.writeFileSync(indexPath, `
+import App from \'${appPath.replace(/\\/g, "/")}\'
+import React from 'react';
+
+export default function render() {
+  return <App />;
+}
+  `.trim());
+    esbuild.build(Object.assign(Object.assign({ entryPoints: [indexPath, ...extensions], outdir: outDirectory }, esbuildOptions), { watch: (watch ? {
             async onRebuild(error, result) {
                 if (error)
                     console.error(error);

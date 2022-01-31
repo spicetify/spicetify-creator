@@ -1,10 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-// const appRoot = require('app-root-path').path;
-// const appRoot = "D:\\SpotifyExtensions\\spicetify-creator-test\\"
-// const App = require(path.join(appRoot, 'src/app'))
-if (require.main)
-    console.log(require.main.filename);
-// export default function render() {
-//   return <App />;
-// }
+const App = require('');
+const react_1 = __importDefault(require("react"));
+function render() {
+    return react_1.default.createElement(App, null);
+}
+exports.default = render;
