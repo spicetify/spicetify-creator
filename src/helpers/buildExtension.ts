@@ -14,7 +14,7 @@ export default async (settings: IExtensionSettings, outDirectory: string, watch:
   const compiledExtensionCSS = path.join(outDirectory, `${settings.nameId}.css`);
 
   esbuild.build({
-    entryPoints: ['./creator/extension/index.ts'],
+    entryPoints: ['./src/app.tsx'],
     outfile: compiledExtension,
     ...esbuildOptions,
     watch: (watch ? {

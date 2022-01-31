@@ -1,7 +1,6 @@
 {
   "cSpell.words": [
     "esbuild",
-    "Spicetify"
-  ],
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+    "spicetify"
+  ]
 }

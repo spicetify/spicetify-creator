@@ -20,8 +20,10 @@ export default async (settings: ICustomAppSettings, outDirectory: string, watch:
   }
   fs.writeFileSync(path.join(outDirectory, "manifest.json"), JSON.stringify(customAppManifest, null, 2))
 
+  fs.writeFileSync("")
+
   esbuild.build({
-    entryPoints: [`./creator/custom-app/index.tsx`, ...extensions],
+    entryPoints: [path.join(__dirname,`../custom-app/index.js`)],
     outdir: outDirectory,
     ...esbuildOptions,
     watch: (watch ? {
