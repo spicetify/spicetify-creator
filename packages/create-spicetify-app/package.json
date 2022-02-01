@@ -1,0 +1,27 @@
+{
+  "name": "create-spicetify-app",
+  "version": "1.1.0-beta.0",
+  "description": "Generates a project with Spicetify Creator.",
+  "bin": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build-dev": "tsc --watch",
+    "postinstall": "tsc"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "cross-spawn": "^7.0.3",
+    "download-git-repo": "^3.0.2",
+    "fs-extra": "^10.0.0",
+    "inquirer": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.2",
+    "@types/fs-extra": "^9.0.13",
+    "@types/inquirer": "^8.2.0",
+    "ts-node": "^10.4.0",
+    "tsc": "^2.0.4",
+    "typescript": "^4.5.5"
+  }
+}
