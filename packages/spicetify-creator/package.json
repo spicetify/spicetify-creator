@@ -1,6 +1,6 @@
 {
   "name": "spicetify-creator",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.2",
   "description": "Easily make Spicetify extensions and custom apps.",
   "bin": "./dist/index.js",
   "scripts": {
