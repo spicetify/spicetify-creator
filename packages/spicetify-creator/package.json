@@ -1,0 +1,28 @@
+{
+  "name": "spicetify-creator",
+  "version": "1.0.1-beta.0",
+  "description": "Easily make Spicetify extensions and custom apps.",
+  "bin": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "build-dev": "tsc --watch",
+    "postinstall": "tsc"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/node": "^17.0.13",
+    "colors": "^1.4.0",
+    "esbuild": "^0.14.13",
+    "esbuild-plugin-postcss2": "^0.1.1",
+    "glob": "^7.2.0",
+    "minimist": "^1.2.5",
+    "sass": "^1.49.0",
+    "typescript-plugin-css-modules": "^3.4.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.4.0",
+    "tsc": "^2.0.4",
+    "typescript": "^4.5.5"
+  }
+}
