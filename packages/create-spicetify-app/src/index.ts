@@ -16,10 +16,11 @@ inquirer.prompt(questions).then(async (answers: IAnswers) => {
 
     await fs.mkdir(projectDir);
     await fs.mkdir(path.join(projectDir, 'src'))
+    await fs.mkdir(path.join(projectDir, 'src/types'))
     await fs.writeFile(path.join(projectDir, 'package.json'), generatePackageJson(answers.nameId));
     await fs.writeFile(path.join(projectDir, 'tsconfig.json'), generateTSConfig());
     await fs.copy(path.join(__dirname, '../template/gitignore'), path.join(projectDir, '.gitignore'));
-    await fs.copy(path.join(__dirname, '../template/css-modules.d.ts'), path.join(projectDir, 'src/css-modules.d.ts'));
+    await fs.copy(path.join(__dirname, '../template/css-modules.d.ts'), path.join(projectDir, 'src/types/css-modules.d.ts'));
 
     if (answers.generateExample) {
       await fs.copy(path.join(__dirname, '../template', answers.type === 'Extension' ? 'extension' : 'customapp'), path.join(projectDir, 'src'));
@@ -33,7 +34,7 @@ inquirer.prompt(questions).then(async (answers: IAnswers) => {
     }));
 
     await new Promise<void>(resolve => https.get("https://raw.githubusercontent.com/khanhas/spicetify-cli/master/globals.d.ts", res => {
-      res.pipe(fs.createWriteStream(path.join(projectDir, 'src/spicetify.d.ts')));
+      res.pipe(fs.createWriteStream(path.join(projectDir, 'src/types/spicetify.d.ts')));
       resolve();
     }));
 
