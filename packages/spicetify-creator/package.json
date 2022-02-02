@@ -1,12 +1,12 @@
 {
   "name": "spicetify-creator",
-  "version": "1.0.2",
+  "version": "1.0.2-beta.0",
   "description": "Easily make Spicetify extensions and custom apps.",
   "bin": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "build-dev": "tsc --watch",
-    "postinstall": "tsc"
+    "prepack": "tsc"
   },
   "license": "MIT",
   "dependencies": {
