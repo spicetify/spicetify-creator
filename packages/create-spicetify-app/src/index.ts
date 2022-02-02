@@ -19,6 +19,7 @@ inquirer.prompt(questions).then(async (answers: IAnswers) => {
     await fs.mkdir(path.join(projectDir, 'src/types'))
     await fs.writeFile(path.join(projectDir, 'package.json'), generatePackageJson(answers.nameId));
     await fs.writeFile(path.join(projectDir, 'tsconfig.json'), generateTSConfig());
+    await fs.writeFile(path.join(projectDir, '.gitattributes'), 'dist/* linguist-vendored');
     await fs.copy(path.join(__dirname, '../template/gitignore'), path.join(projectDir, '.gitignore'));
     await fs.copy(path.join(__dirname, '../template/css-modules.d.ts'), path.join(projectDir, 'src/types/css-modules.d.ts'));
 
