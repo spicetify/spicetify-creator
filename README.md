@@ -30,7 +30,7 @@ spicetify apply
 ### Watching
 ```
 spicetify watch -le OR spicetify watch -la
-yarn run build --watch
+yarn run watch
 ```
 
 ### Structure
@@ -39,7 +39,7 @@ yarn run build --watch
 #### Custom Apps
 - The default component exported from `src/app.tsx` will be displayed as your Custom App.  
 - Each file in the `src/extensions` folder is an extension of its own.  
-- `settings.json`'s structure:
+- `src/settings.json`'s structure:
 ```json
 {
   "displayName": "My App",
@@ -50,15 +50,9 @@ yarn run build --watch
 ```
 #### Extensions
 - The default function exported from `src/app.tsx` is the main function of the extension and runs with Spotify.
-- `settings.json`'s structure:
+- `src/settings.json`'s structure:
 ```json
 {
   "nameId": "my-app"
 }
 ```
-
-## TODO
-- Plugins
-
----
-An improved version of https://github.com/FlafyDev/spicetify-custom-app
