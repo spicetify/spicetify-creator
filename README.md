@@ -20,7 +20,6 @@ Easily make Spicetify extensions and custom apps.
 npx create-spicetify-app OR yarn create spicetify-app
 cd my-app
 spicetify config extensions my-app.js OR spicetify config custom_apps my-app
-npm install OR yarn install
 ```
 ### Building
 ```
