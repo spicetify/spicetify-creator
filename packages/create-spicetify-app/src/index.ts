@@ -15,11 +15,11 @@ inquirer.prompt(questions).then(async (answers: IAnswers) => {
     const devDependencies = ['@types/react', '@types/react-dom', 'spicetify-creator'].sort();
 
     await fs.mkdir(projectDir);
+    await fs.mkdir(path.join(projectDir, 'src'))
     await fs.writeFile(path.join(projectDir, 'package.json'), generatePackageJson(answers.nameId));
     await fs.writeFile(path.join(projectDir, 'tsconfig.json'), generateTSConfig());
     await fs.copy(path.join(__dirname, '../template/gitignore'), path.join(projectDir, '.gitignore'));
-    
-    fs.mkdir(path.join(projectDir, 'src'))
+    await fs.copy(path.join(__dirname, '../template/css-modules.d.ts'), path.join(projectDir, 'src/css-modules.d.ts'));
 
     if (answers.generateExample) {
       await fs.copy(path.join(__dirname, '../template', answers.type === 'Extension' ? 'extension' : 'customapp'), path.join(projectDir, 'src'));

@@ -55,8 +55,8 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
       fs.writeFileSync(compiledExtension, data.join("\n")+"\n");
     }
 
-    console.log("Bundling css and js...");
     if (fs.existsSync(compiledExtensionCSS)) {
+      console.log("Bundling css and js...");
       const css = fs.readFileSync(compiledExtensionCSS, "utf-8");
       fs.rmSync(compiledExtensionCSS);
       fs.appendFileSync(compiledExtension, `

@@ -718,7 +718,7 @@ esbuild-openbsd-64@0.14.14:
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.14.14.tgz#04710ef1d01cd9f15d54f50d20b5a3778f8306a2"
   integrity sha512-HdAnJ399pPff3SKbd8g+P4o5znseni5u5n5rJ6Z7ouqOdgbOwHe2ofZbMow17WMdNtz1IyOZk2Wo9Ve6/lZ4Rg==
 
-esbuild-plugin-postcss2@^0.1.1:
+esbuild-plugin-postcss2@0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/esbuild-plugin-postcss2/-/esbuild-plugin-postcss2-0.1.1.tgz#f7d7964b26cb49f23f620ea437635aba654628f4"
   integrity sha512-BMHnOTfZo+ghrzYnBtcXlHuMpOEwfTFarhGG4o6mivzPZGUXzeMn/hdFhtRpmCKzUvXsaxnZ3N72xA8CwdtZ3w==
