@@ -17,20 +17,20 @@ Easily make Spicetify extensions and custom apps.
 
 ### Creating
 ```
-npx create-spicetify-app
+npx create-spicetify-app OR yarn create spicetify-app
 cd my-app
 spicetify config extensions my-app.js OR spicetify config custom_apps my-app
-yarn
+npm install OR yarn install
 ```
 ### Building
 ```
-yarn run build
+npm run build OR yarn run build
 spicetify apply
 ```
 ### Watching
 ```
 spicetify watch -le OR spicetify watch -la
-yarn run watch
+npm run watch OR yarn run watch
 ```
 
 ### Structure
