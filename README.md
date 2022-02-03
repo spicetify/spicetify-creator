@@ -55,3 +55,6 @@ npm run watch OR yarn run watch
   "nameId": "my-app"
 }
 ```
+
+## Made with Spicetify Creator
+- https://github.com/FlafyDev/spotify-css-editor
