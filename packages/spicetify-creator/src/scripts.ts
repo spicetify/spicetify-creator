@@ -3,16 +3,16 @@ import path from 'path'
 import { promisify } from 'util'
 import { ICustomAppSettings, IExtensionSettings } from './helpers/models'
 import generateId from './helpers/generateId'
-import buildCustomApp from './helpers/buildCustomApp'
-import buildExtension from './helpers/buildExtension'
+import buildCustomApp from './buildCustomApp'
+import buildExtension from './buildExtension'
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
 
 const exec = promisify(require('child_process').exec);
 
-const build = async (watch: boolean, outDirectory?: string) => {
+const build = async (watch: boolean, minify: boolean, outDirectory?: string) => {
   const id = generateId(12)
-  const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync('./settings.json', 'utf-8'));
+  const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync("./src/settings.json", 'utf-8'));
   const spicetifyDirectory = await exec("spicetify -c").then((o: any) => path.dirname(o.stdout.trim()));
   const isExtension = !Object.keys(settings).includes("icon");
   
@@ -38,6 +38,7 @@ const build = async (watch: boolean, outDirectory?: string) => {
   const esbuildOptions = {
     platform: 'browser',
     external: ['react', 'react-dom'],
+    minify: minify,
     bundle: true,
     globalName: id,
     plugins: [

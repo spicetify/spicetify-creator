@@ -1,8 +1,8 @@
 export interface ICustomAppSettings {
   displayName: string,
   nameId: string,
-  icon: string,
-  activeIcon: string,
+  icon?: string,
+  activeIcon?: string,
 };
 
 export interface IExtensionSettings {

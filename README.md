@@ -17,20 +17,19 @@ Easily make Spicetify extensions and custom apps.
 
 ### Creating
 ```
-npx create-spicetify-app
+npx create-spicetify-app OR yarn create spicetify-app
 cd my-app
 spicetify config extensions my-app.js OR spicetify config custom_apps my-app
-yarn
 ```
 ### Building
 ```
-yarn run build
+npm run build OR yarn run build
 spicetify apply
 ```
 ### Watching
 ```
 spicetify watch -le OR spicetify watch -la
-yarn run build --watch
+npm run watch OR yarn run watch
 ```
 
 ### Structure
@@ -39,7 +38,7 @@ yarn run build --watch
 #### Custom Apps
 - The default component exported from `src/app.tsx` will be displayed as your Custom App.  
 - Each file in the `src/extensions` folder is an extension of its own.  
-- `settings.json`'s structure:
+- `src/settings.json`'s structure:
 ```json
 {
   "displayName": "My App",
@@ -50,15 +49,9 @@ yarn run build --watch
 ```
 #### Extensions
 - The default function exported from `src/app.tsx` is the main function of the extension and runs with Spotify.
-- `settings.json`'s structure:
+- `src/settings.json`'s structure:
 ```json
 {
   "nameId": "my-app"
 }
 ```
-
-## TODO
-- Plugins
-
----
-An improved version of https://github.com/FlafyDev/spicetify-custom-app
