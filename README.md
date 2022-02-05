@@ -9,7 +9,7 @@ Easily make Spicetify extensions and custom apps.
 - Node modules
 - CSS/SCSS global and modules (PostCSS)
 - Improved Custom App's structure 
-- [Plugins](/Plugins.md)
+- [Plugins](https://github.com/FlafyDev/spicetify-creator-plugins)
 - Under 1 second compile time with esbuild
 - Save & reload (Save and the changes will appear in Spotify)
 
