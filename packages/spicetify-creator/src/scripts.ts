@@ -44,7 +44,7 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string) => 
       postCssPlugin.default({
         plugins: [autoprefixer],
         modules: {
-          generateScopedName: `[name]__[local]___[hash:base64:5]${id}`
+          generateScopedName: `[name]__[local]___[hash:base64:5]_${id}`
         },
       }),
     ],
