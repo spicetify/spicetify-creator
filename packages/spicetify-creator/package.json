@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "build-dev": "tsc --watch",
-    "prepack": "tsc"
+    "prepack": "yarn run build"
   },
   "license": "MIT",
   "dependencies": {
