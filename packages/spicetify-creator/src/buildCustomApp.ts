@@ -1,5 +1,5 @@
 import glob from 'glob'
-import colors from 'colors/safe'
+import chalk from 'chalk';
 import fs from 'fs'
 import path from 'path'
 import { ICustomAppManifest, ICustomAppSettings, IExtensionSettings } from './helpers/models'
@@ -78,6 +78,6 @@ export default function render() {
     if (fs.existsSync(path.join(outDirectory, "index.css")))
       fs.renameSync(path.join(outDirectory, "index.css"), path.join(outDirectory, "style.css"))
     
-    console.log(colors.green('Build succeeded.'));
+    console.log(chalk.green('Build succeeded.'));
   }
 }

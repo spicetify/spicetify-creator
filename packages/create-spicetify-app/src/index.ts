@@ -6,7 +6,7 @@ import https from 'https'
 import path from 'path';
 import spawn from 'cross-spawn';
 import questions, { IAnswers } from './quiz';
-import colors from 'colors';
+import chalk from 'chalk';
 
 inquirer.prompt(questions).then(async (answers: IAnswers) => {
   try {
@@ -43,9 +43,9 @@ inquirer.prompt(questions).then(async (answers: IAnswers) => {
     if (error)
       throw "Couldn't install dependencies: " + error.message;
     
-    console.log(`\n\n${colors.green("Success:")} A Spicetify Creator project has been created`)
+    console.log(`\n\n${chalk.green("Success:")} A Spicetify Creator project has been created`)
   } catch(err) {
-    console.error(`\n\n${colors.red("Error, something went wrong:")}`, err);
+    console.error(`\n\n${chalk.red("Error, something went wrong:")}`, err);
   }
 });
 

@@ -1,5 +1,5 @@
 import glob from 'glob'
-import colors from 'colors/safe'
+import chalk from 'chalk';
 import fs from 'fs'
 import path from 'path'
 import { ICustomAppManifest, ICustomAppSettings, IExtensionSettings } from './helpers/models'
@@ -75,6 +75,6 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
       `.trim());
     }
 
-    console.log(colors.green('Build succeeded.'));
+    console.log(chalk.green('Build succeeded.'));
   }
 }

@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import spawn from 'cross-spawn'
 
 interface IAnswers {
   type: 'Extension' | 'Custom App',
