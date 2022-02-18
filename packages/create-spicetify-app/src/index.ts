@@ -56,7 +56,7 @@ function generatePackageJson(name: string) {
     private: true,
     scripts: {
       "build": "spicetify-creator",
-      "build-local": "spicetify-creator --out=dist",
+      "build-local": "spicetify-creator --out=dist --minify",
       "watch": "spicetify-creator --watch",
     },
     license: "MIT",
