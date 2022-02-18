@@ -4,8 +4,8 @@
   "description": "Generates a project with Spicetify Creator.",
   "bin": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "build-dev": "tsc --watch",
+    "build": "esbuild src/index.ts --bundle --platform=node --external:../../node_modules/* --outdir=dist --minify",
+    "dev": "yarn run build --watch",
     "prepack": "yarn run build"
   },
   "license": "MIT",
@@ -23,8 +23,6 @@
     "template/**/*"
   ],
   "devDependencies": {
-    "ts-node": "^10.4.0",
-    "tsc": "^2.0.4",
-    "typescript": "^4.5.5"
+    "esbuild": "^0.14.22"
   }
 }
