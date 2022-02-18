@@ -58,7 +58,6 @@ function generatePackageJson(name: string) {
       "build": "spicetify-creator",
       "build-local": "spicetify-creator --out=dist",
       "watch": "spicetify-creator --watch",
-      "watch-local": "spicetify-creator --watch --out=dist",
     },
     license: "MIT",
   }, null, 2);
