@@ -4,9 +4,10 @@ import fs from 'fs'
 import path from 'path'
 import { ICustomAppManifest, ICustomAppSettings, IExtensionSettings } from './helpers/models'
 import extractFiles from './helpers/extractFiles'
+import { minifyFolder } from './helpers/minify';
 const esbuild = require("esbuild")
 
-export default async (settings: ICustomAppSettings, outDirectory: string, watch: boolean, esbuildOptions: any) => {
+export default async (settings: ICustomAppSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean) => {
   const extensions = glob.sync("./src/extensions/*(*.ts|*.tsx|*.js|*.jsx)");
   const extensionsNewNames = extensions.map(e => e.substring(0, e.lastIndexOf(".")) + ".js");
   const iconPath = settings.icon ? path.join('./src', settings.icon) : null;
@@ -60,7 +61,7 @@ export default function render() {
     extractFiles(outDirectory, true);
 
     console.log("Adding react and react-dom...")
-    const jsFiles = await glob.sync(path.join(outDirectory, "/*(*.ts|*.tsx|*.js|*.jsx)"));
+    const jsFiles = await glob.sync(path.join(outDirectory, "/*(*.js)"));
     jsFiles.forEach(jsFile => {
       const data = fs.readFileSync(jsFile, 'utf-8').split("\n");
       const appendAbove = data.findIndex((l) => l.includes(`if (typeof require !== "undefined")`))
@@ -78,6 +79,11 @@ export default function render() {
     if (fs.existsSync(path.join(outDirectory, "index.css")))
       fs.renameSync(path.join(outDirectory, "index.css"), path.join(outDirectory, "style.css"))
     
+    if (minify) {
+      console.log("Minifying...");
+      await minifyFolder(outDirectory);
+    }
+
     console.log(chalk.green('Build succeeded.'));
   }
 }

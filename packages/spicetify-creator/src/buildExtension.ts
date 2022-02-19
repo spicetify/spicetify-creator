@@ -3,11 +3,12 @@ import chalk from 'chalk';
 import fs from 'fs'
 import path from 'path'
 import { ICustomAppManifest, ICustomAppSettings, IExtensionSettings } from './helpers/models'
+import { minifyCSS, minifyFolder } from './helpers/minify';
 const esbuild = require("esbuild")
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
 
-export default async (settings: IExtensionSettings, outDirectory: string, watch: boolean, esbuildOptions: any) => {
+export default async (settings: IExtensionSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean) => {
   // const extension = path.join("./src/", "app.tsx")
   // const extensionName = path.basename(extension.substring(0, extension.lastIndexOf(".")));
   const compiledExtension = path.join(outDirectory, `${settings.nameId}.js`);
@@ -57,7 +58,12 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
 
     if (fs.existsSync(compiledExtensionCSS)) {
       console.log("Bundling css and js...");
-      const css = fs.readFileSync(compiledExtensionCSS, "utf-8");
+      
+      let css = fs.readFileSync(compiledExtensionCSS, "utf-8");
+      if (minify) {
+        css = await minifyCSS(css);
+      }
+
       fs.rmSync(compiledExtensionCSS);
       fs.appendFileSync(compiledExtension, `
   
@@ -73,6 +79,11 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
   })()
   
       `.trim());
+    }
+
+    if (minify) {
+      console.log("Minifying...");
+      await minifyFolder(outDirectory)
     }
 
     console.log(chalk.green('Build succeeded.'));

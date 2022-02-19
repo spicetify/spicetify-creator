@@ -37,7 +37,6 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string) => 
   const esbuildOptions = {
     platform: 'browser',
     external: ['react', 'react-dom'],
-    minify: minify,
     bundle: true,
     globalName: id,
     plugins: [
@@ -51,9 +50,9 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string) => 
   }
 
   if (isExtension) {
-    buildExtension(settings, outDirectory, watch, esbuildOptions);
+    buildExtension(settings, outDirectory, watch, esbuildOptions, minify);
   } else {
-    buildCustomApp(settings, outDirectory, watch, esbuildOptions);
+    buildCustomApp(settings, outDirectory, watch, esbuildOptions, minify);
   }
   
 
