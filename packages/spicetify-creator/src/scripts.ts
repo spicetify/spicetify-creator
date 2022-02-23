@@ -11,7 +11,6 @@ const exec = promisify(require('child_process').exec);
 
 const build = async (watch: boolean, minify: boolean, outDirectory?: string) => {
   const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync("./src/settings.json", 'utf-8'));
-  const spicetifyDirectory = await exec("spicetify -c").then((o: any) => path.dirname(o.stdout.trim()));
   const isExtension = !Object.keys(settings).includes("icon");
   const id = settings.nameId.replace(/\-/g, 'D');
   
@@ -20,8 +19,9 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string) => 
   } else {
     console.log("Custom App detected");
   }
-
+  
   if (!outDirectory) {
+    const spicetifyDirectory = await exec("spicetify -c").then((o: any) => path.dirname(o.stdout.trim()));
     if (isExtension) {
       outDirectory = path.join(spicetifyDirectory, "Extensions");
     } else {
