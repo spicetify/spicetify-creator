@@ -31,7 +31,7 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string) => 
 
   // Create outDirectory if it doesn't exists
   if (!fs.existsSync(outDirectory)){
-    fs.mkdirSync(outDirectory);
+    fs.mkdirSync(outDirectory, { recursive: true });
   }
 
   const esbuildOptions = {
