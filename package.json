@@ -1,6 +1,6 @@
 {
   "private": true,
-  "repository": "https://github.com/FlafyDev/spicetify-creator.git",
+  "repository": "https://github.com/spicetify/spicetify-creator.git",
   "workspaces": [
     "packages/*"
   ],
