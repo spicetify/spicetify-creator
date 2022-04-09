@@ -13,4 +13,4 @@ Spicetify Creator is a tool to compile modern Typescript/Javascript code to Spic
 Check out [Spicetify's docs](https://spicetify.app/docs/development/spicetify-creator/the-basics)!
 
 ## Made with Spicetify Creator
-- https://github.com/FlafyDev/spotify-css-editor
+- https://github.com/spicetify/spicetify-creator
