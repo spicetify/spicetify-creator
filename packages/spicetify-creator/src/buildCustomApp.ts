@@ -34,7 +34,8 @@ import App from \'${appPath.replace(/\\/g, "/")}\'
 import React from 'react';
 
 export default function render() {
-  return <App />;
+  const { location } = Spicetify.Platform.History;
+  return <App {...location.state.props} />;
 }
   `.trim())
 
