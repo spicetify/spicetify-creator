@@ -539,6 +539,11 @@ esbuild-openbsd-64@0.14.47:
   resolved "https://registry.yarnpkg.com/esbuild-openbsd-64/-/esbuild-openbsd-64-0.14.47.tgz#309af806db561aa886c445344d1aacab850dbdc5"
   integrity sha512-QpgN8ofL7B9z8g5zZqJE+eFvD1LehRlxr25PBkjyyasakm4599iroUpaj96rdqRlO2ShuyqwJdr+oNqWwTUmQw==
 
+esbuild-plugin-external-global@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/esbuild-plugin-external-global/-/esbuild-plugin-external-global-1.0.1.tgz#e3bba0e3a561f61b395bec0984a90ed0de06c4ce"
+  integrity sha512-NDzYHRoShpvLqNcrgV8ZQh61sMIFAry5KLTQV83BPG5iTXCCu7h72SCfJ97bW0GqtuqDD/1aqLbKinI/rNgUsg==
+
 esbuild-plugin-postcss2@0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/esbuild-plugin-postcss2/-/esbuild-plugin-postcss2-0.1.1.tgz#f7d7964b26cb49f23f620ea437635aba654628f4"

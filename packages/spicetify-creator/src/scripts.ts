@@ -4,6 +4,7 @@ import { promisify } from 'util'
 import { ICustomAppSettings, IExtensionSettings } from './helpers/models'
 import buildCustomApp from './buildCustomApp'
 import buildExtension from './buildExtension'
+import { externalGlobalPlugin } from 'esbuild-plugin-external-global'
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
 
@@ -46,6 +47,10 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string) => 
           generateScopedName: `[name]__[local]___[hash:base64:5]_${id}`
         },
       }),
+      externalGlobalPlugin({
+        'react': 'Spicetify.React',
+        'react-dom': 'Spicetify.ReactDOM',
+      })
     ],
   }
 

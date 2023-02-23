@@ -47,15 +47,6 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
   })
 
   const afterBundle = async () => {
-    console.log("Adding react and react-dom...")
-    const data = fs.readFileSync(compiledExtension, 'utf-8').split("\n");
-    const appendAbove = data.findIndex((l) => l.includes(`if (typeof require !== "undefined")`))
-    if (appendAbove !== -1) {
-      data.splice(appendAbove, 0,        `if (x === "react") return Spicetify.React;`);
-      data.splice(appendAbove + 1, 0,    `if (x === "react-dom") return Spicetify.ReactDOM;`);
-      fs.writeFileSync(compiledExtension, data.join("\n")+"\n");
-    }
-
     if (fs.existsSync(compiledExtensionCSS)) {
       console.log("Bundling css and js...");
       
