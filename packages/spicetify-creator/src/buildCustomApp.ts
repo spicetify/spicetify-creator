@@ -60,18 +60,6 @@ export default function render() {
     console.log("Moving files out of folders...");
     extractFiles(outDirectory, true);
 
-    console.log("Adding react and react-dom...")
-    const jsFiles = await glob.sync(path.join(outDirectory, "/*(*.js)"));
-    jsFiles.forEach(jsFile => {
-      const data = fs.readFileSync(jsFile, 'utf-8').split("\n");
-      const appendAbove = data.findIndex((l) => l.includes(`if (typeof require !== "undefined")`))
-      if (appendAbove !== -1) {
-        data.splice(appendAbove, 0,        `if (x === "react") return Spicetify.React;`);
-        data.splice(appendAbove + 1, 0,    `if (x === "react-dom") return Spicetify.ReactDOM;`);
-        fs.writeFileSync(jsFile, data.join("\n")+"\n");
-      }
-    })
-
     console.log("Modifying index.js...")
     fs.appendFileSync(path.join(outDirectory, "index.js"), `const render=()=>${esbuildOptions.globalName}.default();\n`);
 
