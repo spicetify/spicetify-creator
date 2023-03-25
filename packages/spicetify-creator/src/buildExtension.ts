@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import fs from 'fs'
 import path from 'path'
 import { ICustomAppManifest, ICustomAppSettings, IExtensionSettings } from './helpers/models'
-import { minifyCSS, minifyFolder } from './helpers/minify';
+import { minifyCSS, minifyFile, minifyFolder } from './helpers/minify';
 const esbuild = require("esbuild")
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
@@ -74,7 +74,7 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
 
     if (minify) {
       console.log("Minifying...");
-      await minifyFolder(outDirectory)
+      await minifyFile(compiledExtension);
     }
 
     console.log(chalk.green('Build succeeded.'));
