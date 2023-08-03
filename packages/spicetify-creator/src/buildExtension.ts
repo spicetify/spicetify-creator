@@ -77,6 +77,15 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
       await minifyFile(compiledExtension);
     }
 
+    // Account for dynamic hooking of React and ReactDOM
+    fm.writeFileSync(compiledExtension, `
+      (async function() {
+        while (!Spicetify.React || !Spicetify.ReactDOM) {
+          await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        ${fs_1.default.readFileSync(compiledExtension, "utf-8")}
+      })();`.trim());
+
     console.log(chalk.green('Build succeeded.'));
   }
 }
