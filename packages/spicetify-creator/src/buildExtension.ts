@@ -78,7 +78,7 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
     }
 
     // Account for dynamic hooking of React and ReactDOM
-    fm.writeFileSync(compiledExtension, `
+    fs.writeFileSync(compiledExtension, `
       (async function() {
         while (!Spicetify.React || !Spicetify.ReactDOM) {
           await new Promise(resolve => setTimeout(resolve, 10));
