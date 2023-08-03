@@ -83,7 +83,7 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
         while (!Spicetify.React || !Spicetify.ReactDOM) {
           await new Promise(resolve => setTimeout(resolve, 10));
         }
-        ${fs_1.default.readFileSync(compiledExtension, "utf-8")}
+        ${fs.readFileSync(compiledExtension, "utf-8")}
       })();`.trim());
 
     console.log(chalk.green('Build succeeded.'));
