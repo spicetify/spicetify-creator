@@ -72,11 +72,6 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
       `.trim());
     }
 
-    if (minify) {
-      console.log("Minifying...");
-      await minifyFile(compiledExtension);
-    }
-
     // Account for dynamic hooking of React and ReactDOM
     fs.writeFileSync(compiledExtension, `
       (async function() {
@@ -84,7 +79,13 @@ import main from \'${appPath.replace(/\\/g, "/")}\'
           await new Promise(resolve => setTimeout(resolve, 10));
         }
         ${fs.readFileSync(compiledExtension, "utf-8")}
-      })();`.trim());
+      })();
+    `.trim());
+
+    if (minify) {
+      console.log("Minifying...");
+      await minifyFile(compiledExtension);
+    }
 
     console.log(chalk.green('Build succeeded.'));
   }
