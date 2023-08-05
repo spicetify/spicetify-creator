@@ -66,6 +66,19 @@ export default function render() {
     console.log("Renaming index.css...")
     if (fs.existsSync(path.join(outDirectory, "index.css")))
       fs.renameSync(path.join(outDirectory, "index.css"), path.join(outDirectory, "style.css"))
+
+    // Account for dynamic hooking of React and ReactDOM
+    extensionsNewNames.map(e => path.basename(e)).map(extensionFile => {
+      const extensionFilePath = path.join(outDirectory, extensionFile);
+      fs.writeFileSync(extensionFilePath, `
+        (async function() {
+          while (!Spicetify.React || !Spicetify.ReactDOM) {
+            await new Promise(resolve => setTimeout(resolve, 10));
+          }
+          ${fs.readFileSync(extensionFilePath, "utf-8")}
+        })();
+      `.trim());
+    });
     
     if (minify) {
       console.log("Minifying...");
