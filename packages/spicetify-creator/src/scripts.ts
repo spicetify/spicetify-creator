@@ -10,7 +10,7 @@ const autoprefixer = require("autoprefixer");
 
 const exec = promisify(require('child_process').exec);
 
-const build = async (watch: boolean, minify: boolean, outDirectory?: string) => {
+const build = async (watch: boolean, minify: boolean, outDirectory?: string, inDirectory?: string) => {
   const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync("./src/settings.json", 'utf-8'));
   const isExtension = !Object.keys(settings).includes("icon");
   const id = settings.nameId.replace(/\-/g, 'D');
@@ -55,9 +55,9 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string) => 
   }
 
   if (isExtension) {
-    buildExtension(settings, outDirectory, watch, esbuildOptions, minify);
+    buildExtension(settings, outDirectory, watch, esbuildOptions, minify, inDirectory || './src');
   } else {
-    buildCustomApp(settings, outDirectory, watch, esbuildOptions, minify);
+    buildCustomApp(settings, outDirectory, watch, esbuildOptions, minify, inDirectory || './src');
   }
   
 

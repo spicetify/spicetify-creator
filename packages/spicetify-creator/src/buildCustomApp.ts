@@ -7,11 +7,11 @@ import extractFiles from './helpers/extractFiles'
 import { minifyFolder } from './helpers/minify';
 const esbuild = require("esbuild")
 
-export default async (settings: ICustomAppSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean) => {
-  const extensions = glob.sync("./src/extensions/*(*.ts|*.tsx|*.js|*.jsx)");
+export default async (settings: ICustomAppSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean, inDirectory: string) => {
+  const extensions = glob.sync(`${inDirectory}/extensions/*(*.ts|*.tsx|*.js|*.jsx)`);
   const extensionsNewNames = extensions.map(e => e.substring(0, e.lastIndexOf(".")) + ".js");
-  const iconPath = settings.icon ? path.join('./src', settings.icon) : null;
-  const activeIconPath = settings.activeIcon ? path.join('./src', settings.activeIcon) : iconPath;
+  const iconPath = settings.icon ? path.join(inDirectory, settings.icon) : null;
+  const activeIconPath = settings.activeIcon ? path.join(inDirectory, settings.activeIcon) : iconPath;
 
   console.log("Generating manifest.json...")
   const customAppManifest = <ICustomAppManifest>{
@@ -23,7 +23,7 @@ export default async (settings: ICustomAppSettings, outDirectory: string, watch:
   }
   fs.writeFileSync(path.join(outDirectory, "manifest.json"), JSON.stringify(customAppManifest, null, 2))
 
-  const appPath = path.resolve(glob.sync('./src/*(app.ts|app.tsx|app.js|app.jsx)')[0]);
+  const appPath = path.resolve(glob.sync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
   const tempFolder = path.join(__dirname,`./temp/`);
   const indexPath = path.join(tempFolder,`index.jsx`);
 
