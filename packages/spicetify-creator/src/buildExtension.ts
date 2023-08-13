@@ -8,13 +8,13 @@ const esbuild = require("esbuild")
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
 
-export default async (settings: IExtensionSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean) => {
+export default async (settings: IExtensionSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean, inDirectory: string) => {
   // const extension = path.join("./src/", "app.tsx")
   // const extensionName = path.basename(extension.substring(0, extension.lastIndexOf(".")));
   const compiledExtension = path.join(outDirectory, `${settings.nameId}.js`);
   const compiledExtensionCSS = path.join(outDirectory, `${settings.nameId}.css`);
 
-  const appPath = path.resolve(glob.sync('./src/*(app.ts|app.tsx|app.js|app.jsx)')[0]);
+  const appPath = path.resolve(glob.sync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
   const tempFolder = path.join(__dirname,`./temp/`);
   const indexPath = path.join(tempFolder,`index.jsx`);
   
