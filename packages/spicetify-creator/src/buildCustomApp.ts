@@ -2,10 +2,11 @@ import glob from 'glob'
 import chalk from 'chalk';
 import fs from 'fs'
 import path from 'path'
-import { ICustomAppManifest, ICustomAppSettings, IExtensionSettings } from './helpers/models'
+import { ICustomAppManifest, ICustomAppSettings } from './helpers/models'
 import extractFiles from './helpers/extractFiles'
 import { minifyFolder } from './helpers/minify';
-const esbuild = require("esbuild")
+import esbuild from "esbuild";
+import process from 'process';
 
 export default async (settings: ICustomAppSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean, inDirectory: string) => {
   const extensions = glob.sync(`${inDirectory}/extensions/*(*.ts|*.tsx|*.js|*.jsx)`);
@@ -24,7 +25,7 @@ export default async (settings: ICustomAppSettings, outDirectory: string, watch:
   fs.writeFileSync(path.join(outDirectory, "manifest.json"), JSON.stringify(customAppManifest, null, 2))
 
   const appPath = path.resolve(glob.sync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
-  const tempFolder = path.join(__dirname,`./temp/`);
+  const tempFolder = path.join(path.dirname(process.argv[1]), `./temp/`);
   const indexPath = path.join(tempFolder,`index.jsx`);
 
   if (!fs.existsSync(tempFolder))

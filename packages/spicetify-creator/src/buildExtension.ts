@@ -2,11 +2,9 @@ import glob from 'glob'
 import chalk from 'chalk';
 import fs from 'fs'
 import path from 'path'
-import { ICustomAppManifest, ICustomAppSettings, IExtensionSettings } from './helpers/models'
-import { minifyCSS, minifyFile, minifyFolder } from './helpers/minify';
-const esbuild = require("esbuild")
-const postCssPlugin = require("esbuild-plugin-postcss2");
-const autoprefixer = require("autoprefixer");
+import { IExtensionSettings } from './helpers/models'
+import { minifyCSS, minifyFile } from './helpers/minify';
+import esbuild from "esbuild";
 
 export default async (settings: IExtensionSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean, inDirectory: string) => {
   // const extension = path.join("./src/", "app.tsx")
@@ -15,7 +13,7 @@ export default async (settings: IExtensionSettings, outDirectory: string, watch:
   const compiledExtensionCSS = path.join(outDirectory, `${settings.nameId}.css`);
 
   const appPath = path.resolve(glob.sync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
-  const tempFolder = path.join(__dirname,`./temp/`);
+  const tempFolder = path.join(path.dirname(process.argv[1]), `./temp/`);
   const indexPath = path.join(tempFolder,`index.jsx`);
   
   if (!fs.existsSync(tempFolder))
