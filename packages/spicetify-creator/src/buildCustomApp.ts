@@ -1,91 +1,113 @@
-import glob from 'glob'
-import chalk from 'chalk';
-import fs from 'fs'
-import path from 'path'
-import { ICustomAppManifest, ICustomAppSettings } from './helpers/models'
-import extractFiles from './helpers/extractFiles'
-import { minifyFolder } from './helpers/minify';
-import esbuild from "esbuild";
-import os from 'os';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, appendFileSync, renameSync } from "fs";
+import { tmpdir } from "os";
+import { resolve, join, basename } from "path";
+import { createHash } from "crypto";
 
-export default async (settings: ICustomAppSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean, inDirectory: string) => {
-  const extensions = glob.sync(`${inDirectory}/extensions/*(*.ts|*.tsx|*.js|*.jsx)`);
-  const extensionsNewNames = extensions.map(e => e.substring(0, e.lastIndexOf(".")) + ".js");
-  const iconPath = settings.icon ? path.join(inDirectory, settings.icon) : null;
-  const activeIconPath = settings.activeIcon ? path.join(inDirectory, settings.activeIcon) : iconPath;
+import { globSync } from "glob";
+import chalk from "chalk";
+import { build, BuildOptions } from "esbuild";
 
-  console.log("Generating manifest.json...")
-  const customAppManifest = <ICustomAppManifest>{
-    name:               settings.displayName,
-    icon:               iconPath ? fs.readFileSync(iconPath, 'utf-8') : "",
-    "active-icon":      activeIconPath ? fs.readFileSync(activeIconPath, 'utf-8') : "",
-    subfiles:           [],
-    subfiles_extension: extensionsNewNames.map(e => path.basename(e))
-  }
-  fs.writeFileSync(path.join(outDirectory, "manifest.json"), JSON.stringify(customAppManifest, null, 2))
+import extractFiles from "./helpers/extractFiles.js";
 
-  const appPath = path.resolve(glob.sync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
-  const tempFolder = path.join(os.tmpdir(), "spicetify-creator");
-  const indexPath = path.join(tempFolder,`index.jsx`);
+function buildCustomApp(
+  settings: CustomAppSettings,
+  outDirectory: string,
+  watch: boolean,
+  esbuildOptions: BuildOptions,
+  inDirectory: string,
+) {
+  const extensions = globSync(`${inDirectory}/extensions/*(*.ts|*.tsx|*.js|*.jsx)`);
+  const extensionsNewNames = extensions.map(
+    (extension) => extension.substring(0, extension.lastIndexOf(".")) + ".js",
+  );
+  const iconPath = settings.icon ? join(inDirectory, settings.icon) : null;
+  const activeIconPath = settings.activeIcon ? join(inDirectory, settings.activeIcon) : iconPath;
 
-  if (!fs.existsSync(tempFolder))
-    fs.mkdirSync(tempFolder)
-  fs.writeFileSync(indexPath, `
+  console.log("Generating manifest.json...");
+  const customAppManifest: CustomAppManifest = {
+    "name": settings.displayName,
+    "icon": iconPath ? readFileSync(iconPath, "utf-8") : "",
+    "active-icon": activeIconPath ? readFileSync(activeIconPath, "utf-8") : "",
+    "subfiles": [],
+    "subfiles_extension": extensionsNewNames.map((extensionNewName) => basename(extensionNewName)),
+  };
+  writeFileSync(join(outDirectory, "manifest.json"), JSON.stringify(customAppManifest, null, 2));
+
+  const appPath = resolve(globSync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
+  const projectHash = createHash("shake256", { outputLength: 8 })
+    .update(appPath + esbuildOptions.globalName)
+    .digest("hex");
+  const tempFolderPath = join(tmpdir(), `spicetify-creator-${projectHash}`);
+  const indexPath = join(tempFolderPath, `index.jsx`);
+
+  if (!existsSync(tempFolderPath)) mkdirSync(tempFolderPath);
+  writeFileSync(
+    indexPath,
+    `
 import App from \'${appPath.replace(/\\/g, "/")}\'
 import React from 'react';
 
 export default function render() {
   return <App />;
 }
-  `.trim())
+  `.trim(),
+  );
 
-  esbuild.build({
+  build({
     entryPoints: [indexPath, ...extensions],
     outdir: outDirectory,
     ...esbuildOptions,
-    watch: (watch ? {
-      async onRebuild(error: any, result: any) {
-        if (error)
-          console.error(error)
-        else {
-          await afterBundle();
+    watch: watch
+      ? {
+          onRebuild(error: any) {
+            if (error) console.error(error);
+            else {
+              afterBundle();
+            }
+          },
         }
-      },
-    } : undefined),
-  }).then(async (r: any) => {
-    await afterBundle();
-    return r;
-  })
+      : undefined,
+  }).then((result) => {
+    afterBundle();
+    return result;
+  });
 
-  const afterBundle = async () => {
+  function afterBundle() {
     console.log("Moving files out of folders...");
     extractFiles(outDirectory, true);
 
-    console.log("Modifying index.js...")
-    fs.appendFileSync(path.join(outDirectory, "index.js"), `const render=()=>${esbuildOptions.globalName}.default();\n`);
+    console.log("Modifying index.js...");
+    appendFileSync(
+      join(outDirectory, "index.js"),
+      `const render=()=>${esbuildOptions.globalName}.default();\n`,
+    );
 
-    console.log("Renaming index.css...")
-    if (fs.existsSync(path.join(outDirectory, "index.css")))
-      fs.renameSync(path.join(outDirectory, "index.css"), path.join(outDirectory, "style.css"))
-
-    // Account for dynamic hooking of React and ReactDOM
-    extensionsNewNames.map(e => path.basename(e)).map(extensionFile => {
-      const extensionFilePath = path.join(outDirectory, extensionFile);
-      fs.writeFileSync(extensionFilePath, `
-        (async function() {
-          while (!Spicetify.React || !Spicetify.ReactDOM) {
-            await new Promise(resolve => setTimeout(resolve, 10));
-          }
-          ${fs.readFileSync(extensionFilePath, "utf-8")}
-        })();
-      `.trim());
-    });
-    
-    if (minify) {
-      console.log("Minifying...");
-      await minifyFolder(outDirectory);
+    console.log("Renaming index.css...");
+    const indexCSSPath = join(outDirectory, "index.css");
+    if (existsSync(indexCSSPath)) {
+      renameSync(indexCSSPath, join(outDirectory, "style.css"));
     }
 
-    console.log(chalk.green('Build succeeded.'));
+    // Account for dynamic hooking of React and ReactDOM
+    extensionsNewNames
+      .map((extensionsNewName) => basename(extensionsNewName))
+      .map((extensionFile) => {
+        const extensionFilePath = join(outDirectory, extensionFile);
+        writeFileSync(
+          extensionFilePath,
+          `
+        (async function() {
+          while (!Spicetify.React || !Spicetify.ReactDOM) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          ${readFileSync(extensionFilePath, "utf-8")}
+        })();
+      `.trim(),
+        );
+      });
+
+    console.log(chalk.green("Build succeeded."));
   }
 }
+
+export default buildCustomApp;

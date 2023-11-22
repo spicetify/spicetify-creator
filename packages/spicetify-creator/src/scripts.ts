@@ -1,70 +1,79 @@
-import fs from 'fs'
-import path from 'path'
-import { promisify } from 'util'
-import { ICustomAppSettings, IExtensionSettings } from './helpers/models'
-import buildCustomApp from './buildCustomApp'
-import buildExtension from './buildExtension'
-import { externalGlobalPlugin } from 'esbuild-plugin-external-global'
-const postCssPlugin = require("esbuild-plugin-postcss2");
-const autoprefixer = require("autoprefixer");
+import { mkdirSync, readFileSync, existsSync } from "fs";
+import { join } from "path";
+import { promisify } from "util";
+import { exec } from "child_process";
 
-const exec = promisify(require('child_process').exec);
+import externalGlobalPlugin from "esbuild-plugin-external-global";
+import stylePlugin from "esbuild-style-plugin";
+import autoprefixer from "autoprefixer";
 
-const build = async (watch: boolean, minify: boolean, outDirectory?: string, inDirectory?: string) => {
-  if (!inDirectory) inDirectory = './src';
-  const settings: ICustomAppSettings & IExtensionSettings = JSON.parse(fs.readFileSync(`${inDirectory}/settings.json`, 'utf-8'));
+import buildCustomApp from "./buildCustomApp.js";
+import buildExtension from "./buildExtension.js";
+import { BuildOptions } from "esbuild";
+
+const execute = promisify(exec);
+
+async function build(watch: boolean, minify: boolean, outDirectory?: string, inDirectory?: string) {
+  if (!inDirectory) inDirectory = "./src";
+  const settings: CustomAppSettings & ExtensionSettings = JSON.parse(
+    readFileSync(`${inDirectory}/settings.json`, "utf-8"),
+  );
   const isExtension = !Object.keys(settings).includes("icon");
-  const id = settings.nameId.replace(/\-/g, 'D');
-  
+  const id = settings.nameId.replace(/\-/g, "D");
+
   if (isExtension) {
     console.log("Extension detected");
   } else {
     console.log("Custom App detected");
   }
-  
+
   if (!outDirectory) {
-    const spicetifyDirectory = await exec("spicetify -c").then((o: any) => path.dirname(o.stdout.trim()));
+    const spicetifyDirectory = await execute("spicetify path userdata").then((output) =>
+      output.stdout.trim(),
+    );
     if (isExtension) {
-      outDirectory = path.join(spicetifyDirectory, "Extensions");
+      outDirectory = join(spicetifyDirectory, "Extensions");
     } else {
-      outDirectory = path.join(spicetifyDirectory, "CustomApps", settings.nameId);
+      outDirectory = join(spicetifyDirectory, "CustomApps", settings.nameId);
     }
   }
 
-  // Create outDirectory if it doesn't exists
-  if (!fs.existsSync(outDirectory)){
-    fs.mkdirSync(outDirectory, { recursive: true });
+  if (!existsSync(outDirectory)) {
+    mkdirSync(outDirectory, { recursive: true });
   }
 
   const esbuildOptions = {
-    platform: 'browser',
-    external: ['react', 'react-dom'],
+    platform: "browser",
+    external: ["react", "react-dom", "react-query"],
     bundle: true,
     globalName: id,
     plugins: [
-      postCssPlugin.default({
-        plugins: [autoprefixer],
-        modules: {
-          generateScopedName: `[name]__[local]___[hash:base64:5]_${id}`
+      stylePlugin({
+        postcss: {
+          plugins: [autoprefixer],
+        },
+        cssModulesOptions: {
+          generateScopedName: `[name]__[local]___[hash:base64:5]_${id}`,
         },
       }),
-      externalGlobalPlugin({
-        'react': 'Spicetify.React',
-        'react-dom': 'Spicetify.ReactDOM',
-      })
+      externalGlobalPlugin.externalGlobalPlugin({
+        "react": "Spicetify.React",
+        "react-dom": "Spicetify.ReactDOM",
+        "react-query": "Spicetify.ReactQuery",
+      }),
     ],
-  }
+    minify,
+  } as unknown as BuildOptions;
 
   if (isExtension) {
-    buildExtension(settings, outDirectory, watch, esbuildOptions, minify, inDirectory);
+    buildExtension(settings, outDirectory, watch, esbuildOptions, inDirectory);
   } else {
-    buildCustomApp(settings, outDirectory, watch, esbuildOptions, minify, inDirectory);
+    buildCustomApp(settings, outDirectory, watch, esbuildOptions, inDirectory);
   }
-  
 
   if (watch) {
-    console.log('Watching...');
+    console.log("Watching...");
   }
-};
+}
 
 export { build };

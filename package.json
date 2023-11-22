@@ -1,8 +1,14 @@
 {
   "private": true,
-  "repository": "https://github.com/spicetify/spicetify-creator.git",
+  "packageManager": "pnpm@8.14.0",
   "workspaces": [
     "packages/*"
   ],
-  "license": "MIT"
+  "scripts": {
+    "format": "prettier . --write --cache"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  }
 }

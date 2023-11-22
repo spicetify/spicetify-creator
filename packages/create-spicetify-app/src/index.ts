@@ -1,105 +1,89 @@
 #!/usr/bin/env node
 
+import { writeFileSync, mkdirSync, createWriteStream, copyFileSync, cpSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+import { get } from "https";
+
+import { execa } from "execa";
 import inquirer from "inquirer";
-import fs from "fs-extra";
-import https from "https";
-import path from "path";
-import spawn from "cross-spawn";
-import questions, { IAnswers } from "./quiz";
 import chalk from "chalk";
 
-inquirer.prompt(questions).then(async (answers: IAnswers) => {
+import questions, { Answers } from "./quiz.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+inquirer.prompt(questions).then(async (answers: Answers) => {
   try {
-    const packageManager =
-      (process.env.npm_config_user_agent || "").indexOf("yarn") === 0
-        ? "yarn"
+    const userAgent = process.env.npm_config_user_agent || "";
+    const packageManager = userAgent.startsWith("yarn")
+      ? "yarn"
+      : userAgent.startsWith("pnpm")
+        ? "pnpm"
         : "npm";
-    const projectDir = path.join(".", answers.nameId);
+
+    const projectDir = join(".", answers.nameId);
     const devDependencies = [
-      "@types/react",
-      "@types/react-dom",
+      "@types/react@17.0.2",
+      "@types/react-dom@17.0.2",
+      "react-query-types",
+      "typescript",
       "spicetify-creator",
     ].sort();
 
-    await fs.mkdir(projectDir);
-    await fs.mkdir(path.join(projectDir, "src"));
-    await fs.mkdir(path.join(projectDir, "src/types"));
-    await fs.writeFile(
-      path.join(projectDir, "package.json"),
-      generatePackageJson(answers.nameId)
-    );
-    await fs.writeFile(
-      path.join(projectDir, "tsconfig.json"),
-      generateTSConfig()
-    );
-    await fs.writeFile(
-      path.join(projectDir, ".gitattributes"),
-      "dist/* linguist-vendored"
-    );
-    await fs.copy(
-      path.join(__dirname, "../template/gitignore"),
-      path.join(projectDir, ".gitignore")
-    );
-    await fs.copy(
-      path.join(__dirname, "../template/css-modules.d.ts"),
-      path.join(projectDir, "src/types/css-modules.d.ts")
+    mkdirSync(projectDir);
+    mkdirSync(join(projectDir, "src"));
+    mkdirSync(join(projectDir, "src/types"));
+    writeFileSync(join(projectDir, "package.json"), generatePackageJson(answers.nameId));
+    writeFileSync(join(projectDir, "tsconfig.json"), generateTSConfig());
+    writeFileSync(join(projectDir, ".gitattributes"), "dist linguist-vendored");
+    copyFileSync(join(__dirname, "../template/gitignore"), join(projectDir, ".gitignore"));
+    copyFileSync(
+      join(__dirname, "../template/css-modules.d.ts"),
+      join(projectDir, "src/types/css-modules.d.ts"),
     );
 
     if (answers.generateExample) {
-      await fs.copy(
-        path.join(
-          __dirname,
-          "../template",
-          answers.type === "Extension" ? "extension" : "customapp"
-        ),
-        path.join(projectDir, "src")
+      cpSync(
+        join(__dirname, "../template", answers.type.toLowerCase().replaceAll(" ", "")),
+        join(projectDir, "src"),
+        { recursive: true },
       );
     }
 
-    await fs.writeFile(
-      path.join(projectDir, "src/settings.json"),
-      generateSettings(answers)
+    writeFileSync(join(projectDir, "src/settings.json"), generateSettings(answers));
+
+    await new Promise<void>((resolve) =>
+      get("https://raw.githubusercontent.com/spicetify/spicetify-creator/main/README.md", (res) => {
+        res.pipe(createWriteStream(join(projectDir, "README.md")));
+        resolve();
+      }),
     );
 
     await new Promise<void>((resolve) =>
-      https.get(
-        "https://raw.githubusercontent.com/spicetify/spicetify-creator/main/README.md",
+      get(
+        "https://raw.githubusercontent.com/spicetify/spicetify-cli/master/globals.d.ts",
         (res) => {
-          res.pipe(fs.createWriteStream(path.join(projectDir, "README.md")));
+          res.pipe(createWriteStream(join(projectDir, "src/types/spicetify.d.ts")));
           resolve();
-        }
-      )
+        },
+      ),
     );
 
-    await new Promise<void>((resolve) =>
-      https.get(
-        "https://raw.githubusercontent.com/khanhas/spicetify-cli/master/globals.d.ts",
-        (res) => {
-          res.pipe(
-            fs.createWriteStream(
-              path.join(projectDir, "src/types/spicetify.d.ts")
-            )
-          );
-          resolve();
-        }
-      )
-    );
+    const command = packageManager === "yarn" ? "add" : "install";
+    const cmd = `${packageManager} ${command} -D ${devDependencies.join(" ")}`;
+    const result = await execa(cmd, {
+      cwd: projectDir,
+      stdio: "inherit",
+      shell: true,
+    });
+    if (result.exitCode !== 0) {
+      throw new Error(`Couldn't install dependencies: ${result.stderr}`);
+    }
 
-    const error = spawn.sync(
-      `cd ${projectDir} && ${packageManager} ${
-        packageManager === "yarn" ? "add" : "install"
-      } -D ${devDependencies.join(" ")}`,
-      { stdio: "inherit", shell: true }
-    ).error;
-    if (error) throw "Couldn't install dependencies: " + error.message;
-
-    console.log(
-      `\n\n${chalk.green(
-        "Success:"
-      )} A Spicetify Creator project has been created`
-    );
-  } catch (err) {
-    console.error(`\n\n${chalk.red("Error, something went wrong:")}`, err);
+    console.log(`\n\n${chalk.green("Success:")} A Spicetify Creator project has been created`);
+  } catch (error) {
+    console.error(`\n\n${chalk.red("Error, something went wrong:")}`, error);
   }
 });
 
@@ -110,14 +94,15 @@ function generatePackageJson(name: string) {
       version: "0.1.0",
       private: true,
       scripts: {
-        build: "spicetify-creator",
-        "build-local": "spicetify-creator --out=dist --minify",
-        watch: "spicetify-creator --watch",
+        "build": "spicetify-creator --in=./src --out=./dist --minify",
+        "build:local": "spicetify-creator",
+        "watch": "spicetify-creator --watch",
+        "update:spicetify-types":
+          "curl -s -o ./src/types/spicetify.d.ts https://raw.githubusercontent.com/spicetify/spicetify-cli/master/globals.d.ts",
       },
-      license: "MIT",
     },
     null,
-    2
+    2,
   );
 }
 
@@ -125,24 +110,29 @@ function generateTSConfig() {
   return JSON.stringify(
     {
       compilerOptions: {
-        target: "ES2017",
+        target: "ES2022",
+        module: "ES2022",
+        moduleResolution: "bundler",
         jsx: "react",
-        module: "commonjs",
-        resolveJsonModule: true,
-        outDir: "dist",
         esModuleInterop: true,
+        skipLibCheck: true,
         forceConsistentCasingInFileNames: true,
         strict: true,
-        skipLibCheck: true,
+        noUnusedLocals: true,
+        noUnusedParameters: true,
+        lib: ["ES2022", "DOM"],
+        paths: {
+          "react-query": ["./node_modules/react-query-types"],
+        },
       },
-      include: ["./src/**/*.*"],
+      include: ["./src/**/*"],
     },
     null,
-    2
+    2,
   );
 }
 
-function generateSettings(answers: IAnswers) {
+function generateSettings(answers: Answers) {
   let settings;
   if (answers.type === "Extension") {
     settings = {

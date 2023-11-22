@@ -1,91 +1,96 @@
-import glob from 'glob'
-import chalk from 'chalk';
-import fs from 'fs'
-import path from 'path'
-import { IExtensionSettings } from './helpers/models'
-import { minifyCSS, minifyFile } from './helpers/minify';
-import esbuild from "esbuild";
-import os from 'os';
+import { existsSync, mkdirSync, rmSync, readFileSync, appendFileSync, writeFileSync } from "fs";
+import { join, resolve } from "path";
+import { tmpdir } from "os";
+import { createHash } from "crypto";
 
-export default async (settings: IExtensionSettings, outDirectory: string, watch: boolean, esbuildOptions: any, minify: boolean, inDirectory: string) => {
-  // const extension = path.join("./src/", "app.tsx")
-  // const extensionName = path.basename(extension.substring(0, extension.lastIndexOf(".")));
-  const compiledExtension = path.join(outDirectory, `${settings.nameId}.js`);
-  const compiledExtensionCSS = path.join(outDirectory, `${settings.nameId}.css`);
+import { globSync } from "glob";
+import chalk from "chalk";
+import { build, BuildOptions } from "esbuild";
 
-  const appPath = path.resolve(glob.sync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
-  const tempFolder = path.join(os.tmpdir(), "spicetify-creator");
-  const indexPath = path.join(tempFolder,`index.jsx`);
-  
-  if (!fs.existsSync(tempFolder))
-    fs.mkdirSync(tempFolder)
-  fs.writeFileSync(indexPath, `
+function buildExtension(
+  settings: ExtensionSettings,
+  outDirectory: string,
+  watch: boolean,
+  esbuildOptions: BuildOptions,
+  inDirectory: string,
+) {
+  const compiledExtensionPath = join(outDirectory, `${settings.nameId}.js`);
+  const compiledExtensionCSSPath = join(outDirectory, `${settings.nameId}.css`);
+
+  const appPath = resolve(globSync(`${inDirectory}/*(app.ts|app.tsx|app.js|app.jsx)`)[0]);
+  const projectHash = createHash("shake256", { outputLength: 8 })
+    .update(appPath + esbuildOptions.globalName)
+    .digest("hex");
+  const tempFolderPath = join(tmpdir(), `spicetify-creator-${projectHash}`);
+  const indexPath = join(tempFolderPath, `index.jsx`);
+
+  if (!existsSync(tempFolderPath)) mkdirSync(tempFolderPath);
+  writeFileSync(
+    indexPath,
+    `
 import main from \'${appPath.replace(/\\/g, "/")}\'
-
 (async () => {
   await main()
 })();
-  `.trim())
+    `.trim(),
+  );
 
-  esbuild.build({
+  build({
     entryPoints: [indexPath],
-    outfile: compiledExtension,
+    outfile: compiledExtensionPath,
     ...esbuildOptions,
-    watch: (watch ? {
-      async onRebuild(error: any, result: any) {
-        if (error)
-          console.error(error)
-        else {
-          await afterBundle();
+    watch: watch
+      ? {
+          onRebuild(error) {
+            if (error) console.error(error);
+            else {
+              afterBundle();
+            }
+          },
         }
-      },
-    } : undefined),
-  }).then(async (r: any) => {
-    await afterBundle();
-    return r;
-  })
+      : undefined,
+  }).then((result) => {
+    afterBundle();
+    return result;
+  });
 
-  const afterBundle = async () => {
-    if (fs.existsSync(compiledExtensionCSS)) {
+  function afterBundle() {
+    if (existsSync(compiledExtensionCSSPath)) {
       console.log("Bundling css and js...");
-      
-      let css = fs.readFileSync(compiledExtensionCSS, "utf-8");
-      if (minify) {
-        css = await minifyCSS(css);
-      }
 
-      fs.rmSync(compiledExtensionCSS);
-      fs.appendFileSync(compiledExtension, `
-  
-  (async () => {
-    if (!document.getElementById(\`${esbuildOptions.globalName}\`)) {
-      var el = document.createElement('style');
-      el.id = \`${esbuildOptions.globalName}\`;
-      el.textContent = (String.raw\`
-  ${css}
-      \`).trim();
-      document.head.appendChild(el);
-    }
-  })()
-  
-      `.trim());
+      const css = readFileSync(compiledExtensionCSSPath, "utf-8");
+      rmSync(compiledExtensionCSSPath);
+
+      appendFileSync(
+        compiledExtensionPath,
+        `
+(() => {
+  if (!document.getElementById(\`${esbuildOptions.globalName}\`)) {
+    const styleElement = document.createElement('style');
+    styleElement.id = \`${esbuildOptions.globalName}\`;
+    styleElement.textContent = (String.raw\`${css}\`).trim();
+    document.head.appendChild(styleElement);
+  }
+})()
+        `.trim(),
+      );
     }
 
     // Account for dynamic hooking of React and ReactDOM
-    fs.writeFileSync(compiledExtension, `
-      (async function() {
-        while (!Spicetify.React || !Spicetify.ReactDOM) {
-          await new Promise(resolve => setTimeout(resolve, 10));
-        }
-        ${fs.readFileSync(compiledExtension, "utf-8")}
-      })();
-    `.trim());
+    writeFileSync(
+      compiledExtensionPath,
+      `
+(async function() {
+  while (!Spicetify.React || !Spicetify.ReactDOM) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  ${readFileSync(compiledExtensionPath, "utf-8")}
+})();
+      `.trim(),
+    );
 
-    if (minify) {
-      console.log("Minifying...");
-      await minifyFile(compiledExtension);
-    }
-
-    console.log(chalk.green('Build succeeded.'));
+    console.log(chalk.green("Build succeeded."));
   }
 }
+
+export default buildExtension;

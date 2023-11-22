@@ -1,34 +1,36 @@
-import glob from 'glob'
-import fs from 'fs'
-import path from 'path'
+import { globSync } from "glob";
+import { lstatSync, copyFileSync, rmSync } from "fs";
+import { join, basename } from "path";
 
 function partition(array: any[], isValid: (e: any) => boolean): [any[], any[]] {
-  return array.reduce(([pass, fail], elem) => {
-    return isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
-  }, [[], []]);
+  return array.reduce(
+    ([pass, fail], element) => {
+      return isValid(element) ? [[...pass, element], fail] : [pass, [...fail, element]];
+    },
+    [[], []],
+  );
 }
 
-/*
-  Extracts all files in a directory to the parent directory
-*/
 function extractFiles(directory: string, subdirectories: boolean, mainDirectory?: string) {
   if (!mainDirectory) {
-    mainDirectory = directory
+    mainDirectory = directory;
   }
 
-  const [inDirs, inFiles] = partition(glob.sync(path.join(directory, "*")), d => fs.lstatSync(d).isDirectory());
+  const [inDirectories, inFiles] = partition(globSync(join(directory, "*")), (directory) =>
+    lstatSync(directory).isDirectory(),
+  );
   if (subdirectories) {
-    inDirs.forEach(dir => {
-      extractFiles(dir, true, mainDirectory);
+    inDirectories.forEach((directory) => {
+      extractFiles(directory, true, mainDirectory);
     });
   }
-  
-  inFiles.forEach(file => {
-    fs.copyFileSync(file, path.join(mainDirectory!, path.basename(file)));
+
+  inFiles.forEach((file) => {
+    copyFileSync(file, join(mainDirectory!, basename(file)));
   });
 
-  inDirs.forEach(dir => {
-    fs.rmSync(dir, { recursive: true, force: true });
+  inDirectories.forEach((directory) => {
+    rmSync(directory, { recursive: true, force: true });
   });
 }
 
