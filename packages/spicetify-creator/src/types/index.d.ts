@@ -1,5 +1,5 @@
 interface CustomAppSettings {
-  displayName: string;
+  displayName: string | Record<string, string>;
   nameId: string;
   icon?: string;
   activeIcon?: string;
@@ -10,7 +10,7 @@ interface ExtensionSettings {
 };
 
 interface CustomAppManifest {
-  "name": string;
+  "name": string | Record<string, string>;
   "icon": string;
   "active-icon": string;
   "subfiles": string[];
