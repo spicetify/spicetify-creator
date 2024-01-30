@@ -19,6 +19,7 @@
     "chalk": "^5.3.0",
     "esbuild": "^0.16.17",
     "esbuild-plugin-external-global": "^1.0.1",
+    "esbuild-plugin-inline-import": "^1.0.2",
     "esbuild-style-plugin": "1.6.3",
     "glob": "^10.3.10",
     "minimist": "^1.2.8"

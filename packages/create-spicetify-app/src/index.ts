@@ -42,6 +42,10 @@ inquirer.prompt(questions).then(async (answers: Answers) => {
       join(__dirname, "../template/css-modules.d.ts"),
       join(projectDir, "src/types/css-modules.d.ts"),
     );
+    copyFileSync(
+      join(__dirname, "../template/inline.d.ts"),
+      join(projectDir, "src/types/inline.d.ts"),
+    );
 
     if (answers.generateExample) {
       cpSync(

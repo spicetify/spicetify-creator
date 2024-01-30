@@ -3,13 +3,14 @@ import { join } from "path";
 import { promisify } from "util";
 import { exec } from "child_process";
 
+import { BuildOptions } from "esbuild";
 import externalGlobalPlugin from "esbuild-plugin-external-global";
+import inlineImportPlugin from "esbuild-plugin-inline-import";
 import stylePlugin from "esbuild-style-plugin";
 import autoprefixer from "autoprefixer";
 
 import buildCustomApp from "./buildCustomApp.js";
 import buildExtension from "./buildExtension.js";
-import { BuildOptions } from "esbuild";
 
 const execute = promisify(exec);
 
@@ -48,6 +49,7 @@ async function build(watch: boolean, minify: boolean, outDirectory?: string, inD
     bundle: true,
     globalName: id,
     plugins: [
+      inlineImportPlugin(),
       stylePlugin({
         postcss: {
           plugins: [autoprefixer],

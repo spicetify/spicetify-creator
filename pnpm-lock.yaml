@@ -48,6 +48,9 @@ importers:
       esbuild-plugin-external-global:
         specifier: ^1.0.1
         version: 1.0.1
+      esbuild-plugin-inline-import:
+        specifier: ^1.0.2
+        version: 1.0.2
       esbuild-style-plugin:
         specifier: 1.6.3
         version: 1.6.3
@@ -773,6 +776,10 @@ packages:
 
   /esbuild-plugin-external-global@1.0.1:
     resolution: {integrity: sha512-NDzYHRoShpvLqNcrgV8ZQh61sMIFAry5KLTQV83BPG5iTXCCu7h72SCfJ97bW0GqtuqDD/1aqLbKinI/rNgUsg==}
+    dev: false
+
+  /esbuild-plugin-inline-import@1.0.2:
+    resolution: {integrity: sha512-BCljgye2Dt63aENlIO3q7UkMhJW1Q2AcMySHGWUw/VAaL9YutKEhUD4t418hSIXWjqx1La+CJLHlJbL1SdH1Uw==}
     dev: false
 
   /esbuild-style-plugin@1.6.3:
