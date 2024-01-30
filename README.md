@@ -7,6 +7,7 @@ Spicetify Creator is a tool to compile modern Typescript/Javascript code to Spic
 - Typescript and React syntax
 - Import node packages
 - CSS/SCSS with PostCSS support
+- Inline import support
 - Extremely fast compile time with esbuild.
 - Plugins
 
