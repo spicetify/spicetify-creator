@@ -45,7 +45,7 @@ async function build(watch: boolean, minify: boolean, outDirectory?: string, inD
 
   const esbuildOptions = {
     platform: "browser",
-    external: ["react", "react-dom", "react-query"],
+    external: ["react", "react-dom"],
     bundle: true,
     globalName: id,
     plugins: [
@@ -61,7 +61,6 @@ async function build(watch: boolean, minify: boolean, outDirectory?: string, inD
       externalGlobalPlugin.externalGlobalPlugin({
         "react": "Spicetify.React",
         "react-dom": "Spicetify.ReactDOM",
-        "react-query": "Spicetify.ReactQuery",
       }),
     ],
     minify,

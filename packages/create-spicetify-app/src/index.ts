@@ -26,7 +26,6 @@ inquirer.prompt(questions).then(async (answers: Answers) => {
     const devDependencies = [
       "@types/react@17.0.2",
       "@types/react-dom@17.0.2",
-      "react-query-types",
       "typescript",
       "spicetify-creator",
     ].sort();
@@ -125,9 +124,6 @@ function generateTSConfig() {
         noUnusedLocals: true,
         noUnusedParameters: true,
         lib: ["ES2022", "DOM"],
-        paths: {
-          "react-query": ["./node_modules/react-query-types"],
-        },
       },
       include: ["./src/**/*"],
     },
